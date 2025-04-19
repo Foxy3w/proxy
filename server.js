@@ -8,18 +8,22 @@ app.use(bodyParser.json());
 
 app.post('/data', async (req, res) => {
   try {
+    // Dynamically forward whatever the ESP32 sends
+    const postData = new URLSearchParams(req.body);
+
     const response = await axios.post(
       'http://sea.free.nf/index.php',
-      new URLSearchParams(req.body),
+      postData,
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }
     );
-    res.send(`Forwarded to sea.free.nf: ${response.data}`);
+
+    res.send(`✅ Forwarded to sea.free.nf:\n\n${response.data}`);
   } catch (error) {
-    res.status(500).send(`Error forwarding: ${error.message}`);
+    res.status(500).send(`❌ Error forwarding: ${error.message}`);
   }
 });
 
