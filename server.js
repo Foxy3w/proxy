@@ -1,13 +1,21 @@
+// server.js
 const express = require('express');
 const bodyParser = require('body-parser');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const uri = 'mongodb+srv://esp32user:mKtHATiPPLFExcU4@cluster0.4kgzd7c.mongodb.net/esp32_data?retryWrites=true&w=majority&tls=true&tlsAllowInvalidCertificates=true';
-const client = new MongoClient(uri);
+const uri = 'mongodb+srv://esp32user:mKtHATiPPLFExcU4@seas.mp7gflp.mongodb.net/esp32_data?retryWrites=true&w=majority&appName=Seas';
+
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
 
 app.post('/data', async (req, res) => {
   try {
@@ -15,13 +23,13 @@ app.post('/data', async (req, res) => {
     const db = client.db('esp32_data');
     const collection = db.collection('readings');
 
-    const data = req.body;
-    await collection.insertOne(data);
-
-    res.send('✅ Data stored in MongoDB');
-  } catch (error) {
-    console.error('Error inserting to MongoDB:', error);
-    res.status(500).send('❌ Error storing data: ' + error.message);
+    const result = await collection.insertOne(req.body);
+    res.send("✅ Data stored: " + result.insertedId);
+  } catch (err) {
+    console.error("MongoDB error:", err);
+    res.status(500).send("❌ MongoDB error: " + err.message);
+  } finally {
+    await client.close();
   }
 });
 
