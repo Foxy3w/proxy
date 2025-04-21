@@ -1,33 +1,29 @@
 const express = require('express');
-const axios = require('axios');
 const bodyParser = require('body-parser');
+const { MongoClient } = require('mongodb');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+const uri = 'mongodb+srv://esp32user:mKtHATiPPLFExcU4@cluster0.4kgzd7c.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const client = new MongoClient(uri);
+
 app.post('/data', async (req, res) => {
   try {
-    // Dynamically forward whatever the ESP32 sends
-    const postData = new URLSearchParams(req.body);
+    await client.connect();
+    const db = client.db('esp32_data');
+    const collection = db.collection('readings');
 
-    const response = await axios.post(
-      'http://sea.free.nf/index.php',
-      postData,
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      }
-    );
+    const data = req.body;
+    await collection.insertOne(data);
 
-    res.send(`✅ Forwarded to sea.free.nf:\n\n${response.data}`);
+    res.send('✅ Data stored in MongoDB');
   } catch (error) {
-    res.status(500).send(`❌ Error forwarding: ${error.message}`);
+    console.error('Error inserting to MongoDB:', error);
+    res.status(500).send('❌ Error storing data: ' + error.message);
   }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Proxy running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
