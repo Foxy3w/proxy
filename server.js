@@ -6,7 +6,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const uri = 'mongodb+srv://esp32user:mKtHATiPPLFExcU4@cluster0.4kgzd7c.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const uri = 'mongodb://esp32user:mKtHATiPPLFExcU4@ac-4kgzd7c-shard-00-00.4kgzd7c.mongodb.net:27017,ac-4kgzd7c-shard-00-01.4kgzd7c.mongodb.net:27017,ac-4kgzd7c-shard-00-02.4kgzd7c.mongodb.net:27017/esp32_data?ssl=true&replicaSet=atlas-lgfrk2-shard-0&authSource=admin&retryWrites=true&w=majority';
 const client = new MongoClient(uri);
 
 app.post('/data', async (req, res) => {
