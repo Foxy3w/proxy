@@ -1,0 +1,203 @@
+[
+  {
+    "room":"1",
+    "room_type":"Bedroom",
+    "date":"2025-04-25",
+    "volume_m3":36,
+    "daily_goal_kwh":0.9,
+    "daily_energy_kwh":13.73,
+    "daily_cost_sar":4.12,
+    "over_goal":true,
+    "readings":95,
+    "valid_readings":95,
+    "dropped_readings":0,
+    "flags":[
+      "Uncomfortable temperature",
+      "Poor air quality while occupied"
+    ]
+  },
+  {
+    "room":"1",
+    "room_type":"Bedroom",
+    "date":"2025-04-26",
+    "volume_m3":36,
+    "daily_goal_kwh":0.9,
+    "daily_energy_kwh":14.16,
+    "daily_cost_sar":4.25,
+    "over_goal":true,
+    "readings":96,
+    "valid_readings":96,
+    "dropped_readings":0,
+    "flags":[
+      "Uncomfortable temperature",
+      "Poor air quality while occupied"
+    ]
+  },
+  {
+    "room":"1",
+    "room_type":"Bedroom",
+    "date":"2025-04-27",
+    "volume_m3":36,
+    "daily_goal_kwh":0.9,
+    "daily_energy_kwh":13.47,
+    "daily_cost_sar":4.04,
+    "over_goal":true,
+    "readings":96,
+    "valid_readings":96,
+    "dropped_readings":0,
+    "flags":[
+      "Uncomfortable temperature",
+      "Poor air quality while occupied"
+    ]
+  },
+  {
+    "room":"1",
+    "room_type":"Bedroom",
+    "date":"2025-04-28",
+    "volume_m3":36,
+    "daily_goal_kwh":0.9,
+    "daily_energy_kwh":0.0,
+    "daily_cost_sar":0.0,
+    "over_goal":false,
+    "readings":1,
+    "valid_readings":1,
+    "dropped_readings":0,
+    "flags":[
+
+    ]
+  },
+  {
+    "room":"2",
+    "room_type":"Kitchen",
+    "date":"2025-04-25",
+    "volume_m3":27,
+    "daily_goal_kwh":1.21,
+    "daily_energy_kwh":15.03,
+    "daily_cost_sar":4.51,
+    "over_goal":true,
+    "readings":95,
+    "valid_readings":95,
+    "dropped_readings":0,
+    "flags":[
+      "Uncomfortable temperature",
+      "Poor air quality while occupied"
+    ]
+  },
+  {
+    "room":"2",
+    "room_type":"Kitchen",
+    "date":"2025-04-26",
+    "volume_m3":27,
+    "daily_goal_kwh":1.21,
+    "daily_energy_kwh":13.9,
+    "daily_cost_sar":4.17,
+    "over_goal":true,
+    "readings":96,
+    "valid_readings":96,
+    "dropped_readings":0,
+    "flags":[
+      "Uncomfortable temperature",
+      "Poor air quality while occupied"
+    ]
+  },
+  {
+    "room":"2",
+    "room_type":"Kitchen",
+    "date":"2025-04-27",
+    "volume_m3":27,
+    "daily_goal_kwh":1.21,
+    "daily_energy_kwh":13.43,
+    "daily_cost_sar":4.03,
+    "over_goal":true,
+    "readings":96,
+    "valid_readings":96,
+    "dropped_readings":0,
+    "flags":[
+      "Uncomfortable temperature",
+      "Poor air quality while occupied"
+    ]
+  },
+  {
+    "room":"2",
+    "room_type":"Kitchen",
+    "date":"2025-04-28",
+    "volume_m3":27,
+    "daily_goal_kwh":1.21,
+    "daily_energy_kwh":0.0,
+    "daily_cost_sar":0.0,
+    "over_goal":false,
+    "readings":1,
+    "valid_readings":1,
+    "dropped_readings":0,
+    "flags":[
+
+    ]
+  },
+  {
+    "room":"3",
+    "room_type":"Living",
+    "date":"2025-04-25",
+    "volume_m3":60,
+    "daily_goal_kwh":1.8,
+    "daily_energy_kwh":15.19,
+    "daily_cost_sar":4.56,
+    "over_goal":true,
+    "readings":95,
+    "valid_readings":95,
+    "dropped_readings":0,
+    "flags":[
+      "Uncomfortable temperature",
+      "Poor air quality while occupied"
+    ]
+  },
+  {
+    "room":"3",
+    "room_type":"Living",
+    "date":"2025-04-26",
+    "volume_m3":60,
+    "daily_goal_kwh":1.8,
+    "daily_energy_kwh":14.86,
+    "daily_cost_sar":4.46,
+    "over_goal":true,
+    "readings":96,
+    "valid_readings":96,
+    "dropped_readings":0,
+    "flags":[
+      "Uncomfortable temperature",
+      "Poor air quality while occupied"
+    ]
+  },
+  {
+    "room":"3",
+    "room_type":"Living",
+    "date":"2025-04-27",
+    "volume_m3":60,
+    "daily_goal_kwh":1.8,
+    "daily_energy_kwh":14.43,
+    "daily_cost_sar":4.33,
+    "over_goal":true,
+    "readings":96,
+    "valid_readings":96,
+    "dropped_readings":0,
+    "flags":[
+      "Uncomfortable temperature",
+      "Poor air quality while occupied"
+    ]
+  },
+  {
+    "room":"3",
+    "room_type":"Living",
+    "date":"2025-04-28",
+    "volume_m3":60,
+    "daily_goal_kwh":1.8,
+    "daily_energy_kwh":0.0,
+    "daily_cost_sar":0.0,
+    "over_goal":false,
+    "readings":1,
+    "valid_readings":1,
+    "dropped_readings":0,
+    "flags":[
+
+    ]
+  }
+]
