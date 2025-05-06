@@ -13,7 +13,6 @@ BASELINE_KWH_PER_M3 = {
     "Office": 0.50
 }
 
-
 ROOM_TYPE_LIMITS = {
     "Bedroom": {"temp": (22, 26), "humidity": (30, 60), "co2": 1000, "light": (100, 300)},
     "Living": {"temp": (23, 27), "humidity": (30, 60), "co2": 1000, "light": (150, 500)},
@@ -32,6 +31,15 @@ def load_data():
     readings = list(db['readings'].find())
     df_rooms = pd.DataFrame(rooms)
     df_readings = pd.DataFrame(readings)
+
+    # Convert strings to proper types
+    numeric_fields = ['temperature', 'humidity', 'energy', 'light', 'pressure', 'CO2']
+    for field in numeric_fields:
+        df_readings[field] = pd.to_numeric(df_readings[field], errors='coerce')
+
+    df_readings['Occupancy'] = df_readings['Occupancy'].astype(str).str.lower().map({'true': True, 'false': False})
+    df_readings['timestamp'] = pd.to_datetime(df_readings['timestamp'], errors='coerce')
+
     return df_readings, df_rooms, db
 
 # 2. Analyze data with flags and metrics
