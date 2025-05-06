@@ -12,6 +12,14 @@ db = client['esp32_data']
 readings = pd.DataFrame(list(db['readings'].find()))
 rooms = pd.DataFrame(list(db['rooms'].find()))
 
+# Convert string fields to correct data types
+numeric_fields = ['temperature', 'humidity', 'energy', 'light', 'pressure', 'CO2']
+for field in numeric_fields:
+    readings[field] = pd.to_numeric(readings[field], errors='coerce')
+
+# Convert Occupancy to boolean
+readings['Occupancy'] = readings['Occupancy'].astype(str).str.lower().map({'true': True, 'false': False})
+
 # Preprocess
 readings['timestamp'] = pd.to_datetime(readings['timestamp'])
 readings['date'] = readings['timestamp'].dt.date

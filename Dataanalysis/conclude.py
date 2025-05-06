@@ -21,19 +21,26 @@ db = client['esp32_data']
 readings = pd.DataFrame(list(db['readings'].find()))
 rooms = pd.DataFrame(list(db['rooms'].find()))
 
-# Prepare and clean data
+# --- CONVERT STRINGS TO PROPER TYPES ---
+numeric_fields = ['temperature', 'humidity', 'energy', 'light', 'pressure', 'CO2']
+for field in numeric_fields:
+    readings[field] = pd.to_numeric(readings[field], errors='coerce')
+
+readings['Occupancy'] = readings['Occupancy'].astype(str).str.lower().map({'true': True, 'false': False})
 readings['timestamp'] = pd.to_datetime(readings['timestamp'])
 readings['hour'] = (readings['timestamp'] - readings['timestamp'].min()).dt.total_seconds() / 3600
 readings['date'] = readings['timestamp'].dt.date
+
+# Merge room details
 readings = readings.merge(rooms, on='room', suffixes=("", "_room"))
 readings = readings.sort_values(by=['room', 'timestamp']).reset_index(drop=True)
 
-# Helper: describe flag with duration, energy, and cost
+# --- Flag Helper ---
 def describe_flag(group, condition_fn, label, estimate_energy=True):
     flagged = group[condition_fn(group)]
     if flagged.empty:
         return None
-    duration_min = len(flagged) * 15  # assuming 15 min per reading
+    duration_min = len(flagged) * 15  # 15 min intervals
     energy_loss = 0.0
     cost = 0.0
     if estimate_energy:
@@ -49,7 +56,7 @@ def describe_flag(group, condition_fn, label, estimate_energy=True):
         "cost": cost
     }
 
-# PDF Report Generator
+# --- PDF Class ---
 class AuditPDF(FPDF):
     def header(self):
         self.set_font('Arial', 'B', 12)
@@ -80,10 +87,9 @@ class AuditPDF(FPDF):
             self.image(image_path, x=10, w=180)
             self.ln(10)
 
-# Main: generate report
+# --- Main PDF Report ---
 pdf = AuditPDF()
 pdf.add_page()
-
 graphs_to_add = []
 
 for date in sorted(readings['date'].unique()):
@@ -92,78 +98,51 @@ for date in sorted(readings['date'].unique()):
         room_type = group['room_type'].iloc[0]
         flags = []
 
-        # Flag: Lights on while unoccupied (relaxed threshold)
-        flag = describe_flag(
-            group,
-            lambda df: (df['light'] > 100) & (df['Occupancy'] == False),
-            "[Energy] Lights were on while unoccupied",
-            estimate_energy=True
-        )
+        flag = describe_flag(group, lambda df: (df['light'] > 100) & (df['Occupancy'] == False),
+                             "[Energy] Lights were on while unoccupied")
         if flag: flags.append(flag)
 
-        # Flag: High CO2 while unoccupied (relaxed threshold)
-        flag = describe_flag(
-            group,
-            lambda df: (df['CO2'] > 800) & (df['Occupancy'] == False),
-            "[Ventilation] High CO2 levels while unoccupied",
-            estimate_energy=False
-        )
+        flag = describe_flag(group, lambda df: (df['CO2'] > 800) & (df['Occupancy'] == False),
+                             "[Ventilation] High CO2 levels while unoccupied", estimate_energy=False)
         if flag: flags.append(flag)
 
-        # Flag: Rapid temperature fluctuation (relaxed threshold)
         if group['temperature'].max() - group['temperature'].min() > 3:
             flags.append({
                 "label": "[Comfort] Rapid temperature fluctuation (>3°C)",
-                "duration": 'N/A',
-                "energy": 0,
-                "cost": 0.00
+                "duration": 'N/A', "energy": 0, "cost": 0.00
             })
 
-        # Flag: Unoccupied but energy used
-        flag = describe_flag(
-            group,
-            lambda df: (df['Occupancy'] == False) & (df['energy'].diff().fillna(0) > 0.05),
-            "[Energy] Energy consumed while unoccupied",
-            estimate_energy=True
-        )
+        flag = describe_flag(group, lambda df: (df['Occupancy'] == False) & (df['energy'].diff().fillna(0) > 0.05),
+                             "[Energy] Energy consumed while unoccupied")
         if flag: flags.append(flag)
 
-        # Flag: Occupied but no energy use
         if (group['Occupancy'] == True).any() and (group['energy'].diff().fillna(0) <= 0).all():
             flags.append({
                 "label": "[Anomaly] Occupied but no energy consumption",
-                "duration": 'N/A',
-                "energy": 0,
-                "cost": 0.00
+                "duration": 'N/A', "energy": 0, "cost": 0.00
             })
 
-        # Flag: No energy usage recorded
         if (group['energy'].diff().fillna(0) <= 0).all():
             flags.append({
                 "label": "[Anomaly] No energy usage recorded",
-                "duration": 'N/A',
-                "energy": 0,
-                "cost": 0.00
+                "duration": 'N/A', "energy": 0, "cost": 0.00
             })
 
-        # Flag: Sudden spike in energy usage
         if (group['energy'].diff() > 10).any():
             flags.append({
                 "label": "[Anomaly] Sudden spike in energy usage (Δ > 10 kWh)",
-                "duration": 'N/A',
-                "energy": 0,
-                "cost": 0.00
+                "duration": 'N/A', "energy": 0, "cost": 0.00
             })
 
-        # Add section to PDF
         pdf.room_section(str(date), room_id, room_type, flags)
 
-# === NEW CROSS-DAY GRAPHS ===
+# --- Cross-day Graphs ---
 os.makedirs("graphs", exist_ok=True)
 for room_id, group in readings.groupby('room'):
     plt.figure(figsize=(10, 4))
     plt.plot(group['hour'], group['light'], label='Light (lux)', color='blue')
-    plt.fill_between(group['hour'], 0, group['light'], where=group['Occupancy'], color='orange', alpha=0.3, label='Occupied')
+    plt.fill_between(group['hour'], 0, group['light'], where=group['Occupancy'],
+                     color='orange', alpha=0.3, label='Occupied')
     plt.title(f"Room {room_id} - Light vs Occupancy Across Days")
     plt.xlabel("Hour")
     plt.ylabel("Light (lux)")
@@ -174,7 +153,7 @@ for room_id, group in readings.groupby('room'):
     plt.close()
     graphs_to_add.append(path)
 
-# Add graphs to end of PDF
+# --- Add Graphs to PDF ---
 pdf.add_page()
 pdf.set_font('Arial', 'B', 12)
 pdf.cell(0, 10, 'Combined Summary Graphs', ln=1, align='C')
@@ -182,7 +161,7 @@ pdf.ln(5)
 for graph in graphs_to_add:
     pdf.insert_graph(graph)
 
-# Save PDF
+# --- Save PDF ---
 output_path = os.path.join(os.getcwd(), "audit_report.pdf")
 pdf.output(output_path)
 print(f"✅ PDF report generated: {output_path}")
